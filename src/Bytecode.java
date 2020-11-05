@@ -32,4 +32,12 @@ public class Bytecode {
     public static final short RET = 17;
     public static final short HALT = 18;
 
+    public static Instruction[] instructions = new Instruction[] { null, new Instruction("iadd"),
+            new Instruction("isub"), new Instruction("imul"), new Instruction("ilt"), new Instruction("ieq"),
+            new Instruction("br", 1), new Instruction("brt", 1), new Instruction("brf", 1),
+            new Instruction("iconst", 1), new Instruction("load", 1), new Instruction("gload", 1),
+            new Instruction("store", 1), new Instruction("gstore", 1), new Instruction("print"), new Instruction("pop"),
+            new Instruction("call", 1), new Instruction("ret"), new Instruction("halt")
+
+    };
 }
