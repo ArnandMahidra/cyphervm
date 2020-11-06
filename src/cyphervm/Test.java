@@ -44,13 +44,18 @@ public class Test {
             LOAD, 1, ICONST, 2, IMUL, RET };
 
     static FuncMetaData[] f_metadata = { new FuncMetaData("main", 0, 0, 0), new FuncMetaData("f", 1, 1, 6) };
-    
+
     // main method
 
     public static void main(String[] args) {
         Vm vm = new Vm(factorial, 0, factorial_metadata);
         vm.trace = true;
         vm.exec(factorial_metadata[0].address);
+        vm = new Vm(f, 2, f_metadata);
+        vm.exec(f_metadata[0].address);
+        vm.dumpDataMemory();
 
+        vm = new Vm(loop, 2, loop_metadata);
+        vm.exec(loop_metadata[0].address);
     }
 }
