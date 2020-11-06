@@ -19,6 +19,9 @@ import static cyphervm.Bytecode.PRINT;
 import static cyphervm.Bytecode.RET;
 import static cyphervm.Bytecode.STORE;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // implement a stack based interpreter
 public class Vm {
     public static final int DEFAULT_STACK_SIZE = 1000;
@@ -37,4 +40,123 @@ public class Vm {
     Context ctx;
 
     FuncMetaData[] metadata;
+
+    public boolean trace = false;
+
+    public VM(int[] code, int nglobals, FuncMetaData[] metadata) {
+		this.code = code;
+		globals = new int[nglobals];
+		stack = new int[DEFAULT_STACK_SIZE];
+		this.metadata = metadata;
+    }
+
+    public void exec(int startip) {
+        ip = startip;
+        ctx = new Context(null, 0, metadata[0]); // simulate a call to main()
+        cpu();
+    }
+
+    // start FDE cycle semilation
+    void cpu() {
+        int opcode = code[ip];
+        int a, b, addr, regnum;
+        while (opcode != HALT && ip < code.length) {
+            if (trace)
+                System.err.printf("%-35s", disInstr());
+            ip++; // jump to next instruction or to operand
+            switch (opcode) {
+                case IADD:
+                    b = stack[sp--]; // 2nd opnd at top of stack
+                    a = stack[sp--]; // 1st opnd 1 below top
+                    stack[++sp] = a + b; // push result
+                    break;
+                case ISUB:
+                    b = stack[sp--];
+                    a = stack[sp--];
+                    stack[++sp] = a - b;
+                    break;
+                case IMUL:
+                    b = stack[sp--];
+                    a = stack[sp--];
+                    stack[++sp] = a * b;
+                    break;
+                case ILT:
+                    b = stack[sp--];
+                    a = stack[sp--];
+                    stack[++sp] = (a < b) ? TRUE : FALSE;
+                    break;
+                case IEQ:
+                    b = stack[sp--];
+                    a = stack[sp--];
+                    stack[++sp] = (a == b) ? TRUE : FALSE;
+                    break;
+                case BR:
+                    ip = code[ip++];
+                    break;
+                case BRT:
+                    addr = code[ip++];
+                    if (stack[sp--] == TRUE)
+                        ip = addr;
+                    break;
+                case BRF:
+                    addr = code[ip++];
+                    if (stack[sp--] == FALSE)
+                        ip = addr;
+                    break;
+                case ICONST:
+                    stack[++sp] = code[ip++]; // push operand
+                    break;
+                case LOAD: // load local or arg
+                    regnum = code[ip++];
+                    stack[++sp] = ctx.locals[regnum];
+                    break;
+                case GLOAD:// load from global memory
+                    addr = code[ip++];
+                    stack[++sp] = globals[addr];
+                    break;
+                case STORE:
+                    regnum = code[ip++];
+                    ctx.locals[regnum] = stack[sp--];
+                    break;
+                case GSTORE:
+                    addr = code[ip++];
+                    globals[addr] = stack[sp--];
+                    break;
+                case PRINT:
+                    System.out.println(stack[sp--]);
+                    break;
+                case POP:
+                    --sp;
+                    break;
+                case CALL:
+                    // expects all args on stack
+                    int findex = code[ip++]; // index of target function
+                    int nargs = metadata[findex].nargs; // how many args got pushed
+                    ctx = new Context(ctx, ip, metadata[findex]);
+                    // copy args into new context
+                    int firstarg = sp - nargs + 1;
+                    for (int i = 0; i < nargs; i++) {
+                        ctx.locals[i] = stack[firstarg + i];
+                    }
+                    sp -= nargs;
+                    ip = metadata[findex].address; // jump to function
+                    break;
+                case RET:
+                    ip = ctx.returnip;
+                    ctx = ctx.invokingContext; // pop
+                    break;
+                default:
+                    throw new Error("invalid opcode: " + opcode + " at ip=" + (ip - 1));
+            }
+            if (trace)
+                System.err.printf("%-22s %s\n", stackString(), callStackString());
+            opcode = code[ip];
+        }
+        if (trace)
+            System.err.printf("%-35s", disInstr());
+        if (trace)
+            System.err.println(stackString());
+        if (trace)
+            dumpDataMemory();
+    }
 }
