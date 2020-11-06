@@ -163,6 +163,35 @@ public class Vm {
     protected String stackString() {
         StringBuilder buf = new StringBuilder();
         buf.append("stack=[");
+        for (int i = 0; i <= sp; i++) {
+            int o = stack[i];
+            buf.append(" ");
+            buf.append(o);
+        }
+        buf.append(" ]");
+        return buf.toString();
+    }
+
+    protected String disInstr() {
+        int opcode = code[ip];
+        String opName = Bytecode.instructions[opcode].name;
+        StringBuilder buf = new StringBuilder();
+        buf.append(String.format("%04d:\t%-11s", ip, opName));
+        int nargs = Bytecode.instructions[opcode].n;
+        if (opcode == CALL) {
+            buf.append(metadata[code[ip + 1]].name);
+        } else if (nargs > 0) {
+            List<String> operands = new ArrayList<String>();
+            for (int i = ip + 1; i <= ip + nargs; i++) {
+                operands.add(String.valueOf(code[i]));
+            }
+            for (int i = 0; i < operands.size(); i++) {
+                String s = operands.get(i);
+                if (i > 0)
+                    buf.append(", ");
+                buf.append(s);
+            }
+        }
         return buf.toString();
     }
 }
