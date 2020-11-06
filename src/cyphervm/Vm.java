@@ -57,7 +57,7 @@ public class Vm {
     }
 
     // start FDE cycle semilation
-    void cpu() {
+    protected void cpu() {
         int opcode = code[ip];
         int a, b, addr, regnum;
         while (opcode != HALT && ip < code.length) {
@@ -158,5 +158,11 @@ public class Vm {
             System.err.println(stackString());
         if (trace)
             dumpDataMemory();
+    }
+
+    protected String stackString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("stack=[");
+        return buf.toString();
     }
 }
