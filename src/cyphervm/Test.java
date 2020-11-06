@@ -45,5 +45,12 @@ public class Test {
 
     static FuncMetaData[] f_metadata = { new FuncMetaData("main", 0, 0, 0), new FuncMetaData("f", 1, 1, 6) };
     
+    // main method
 
+    public static void main(String[] args) {
+        Vm vm = new Vm(factorial, 0, factorial_metadata);
+        vm.trace = true;
+        vm.exec(factorial_metadata[0].address);
+
+    }
 }
