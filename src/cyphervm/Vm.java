@@ -23,6 +23,18 @@ import static cyphervm.Bytecode.STORE;
 public class Vm {
     public static final int DEFAULT_STACK_SIZE = 1000;
     public static final int DEFAULT_CALL_STACK_SIZE = 1000;
-    public static final int FALSEVAL = 0;
-    public static final int TRUEVAL = 1;
+    public static final int FALSE = 0;
+    public static final int TRUE = 1;
+
+    // registers
+    int ip;
+    int sp = -1;
+
+    // Memory
+    int[] code;
+    int[] globals;
+    int[] stack;
+    Context ctx;
+
+    FuncMetaData[] metadata;
 }
