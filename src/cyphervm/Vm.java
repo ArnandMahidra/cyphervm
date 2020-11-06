@@ -43,11 +43,12 @@ public class Vm {
 
     public boolean trace = false;
 
-    public VM(int[] code, int nglobals, FuncMetaData[] metadata) {
-		this.code = code;
-		globals = new int[nglobals];
-		stack = new int[DEFAULT_STACK_SIZE];
-		this.metadata = metadata;
+    // constructor
+    public Vm(int[] code, int nglobals, FuncMetaData[] metadata) {
+        this.code = code;
+        globals = new int[nglobals];
+        stack = new int[DEFAULT_STACK_SIZE];
+        this.metadata = metadata;
     }
 
     public void exec(int startip) {
@@ -172,6 +173,18 @@ public class Vm {
         return buf.toString();
     }
 
+    String callStackString() {
+        List<String> stack = new ArrayList<String>();
+        Context c = ctx;
+        while (c != null) {
+            if (c.metadata != null) {
+                stack.add(0, c.metadata.name);
+            }
+            c = c.invokingContext;
+        }
+        return "calls=" + stack.toString();
+    }
+
     protected String disInstr() {
         int opcode = code[ip];
         String opName = Bytecode.instructions[opcode].name;
@@ -193,5 +206,16 @@ public class Vm {
             }
         }
         return buf.toString();
+    }
+
+    // dump data
+    void dumpDataMemory() {
+        System.err.println("Data memory:");
+        int addr = 0;
+        for (int o : globals) {
+            System.err.printf("%04d: %s\n", addr, o);
+            addr++;
+        }
+        System.err.println();
     }
 }
