@@ -4,7 +4,7 @@ a java virtual machine (in progress) and a play ground project for me where I im
 
 # cyphervm instruction set
 
-![# cyphervm-instruction-set](https://cycl0matic.github.com/images/instructionSet.png)
+![# cyphervm-instruction-set](https://github.com/cycl0matic/cyphervm/blob/main/images/instructionSet.png)
 
 # Instruction Format
 
@@ -16,7 +16,7 @@ bytecodes   : `bytes stored as ints`
 
 # stack machine
 
-![# cyphervm-Stack-machine](https://cycl0matic.github.com/images/stackMachine.png)
+![# cyphervm-Stack-machine](https://github.com/cycl0matic/cyphervm/blob/main/images/stackMachine.png)
 
 ``` 
 fetch   : opcode = code[ip]
